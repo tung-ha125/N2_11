@@ -1,5 +1,9 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Dictionary {
-    ArrayList<Word> listWord;
+    public static ArrayList<Word> words;
+    public Dictionary() {
+        words = new ArrayList<Word>();
+    }
 }
