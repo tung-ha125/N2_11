@@ -1,0 +1,3 @@
+apple	tao
+orange	cam
+banana	chuoi
