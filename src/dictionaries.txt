@@ -1,3 +1,5 @@
-apple	tao
-orange	cam
-banana	chuoi
+fish	con ca
+cat	con meo
+bird	con cu
+rat	jerry
+mouse	con chuot ngu
