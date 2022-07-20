@@ -1,5 +1,5 @@
+cat	meo
 fish	con ca
-cat	con meo
-bird	con cu
-rat	jerry
-mouse	con chuot ngu
+mouse	chuot ngu
+duck	quac quac
+bird 	con cu

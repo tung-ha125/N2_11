@@ -72,45 +72,49 @@ public class DictionaryManagement extends Dictionary {
         return new Word(word_target,word_explain);
     }
 
-    public Word dictionaryLookup(String s) {
-        String userWord = getUserWord(s);
+    public void dictionaryLookup() {
+        String userWord = getUserWord("find");
         Word word = findWordInDictionary(userWord);
         if (word == null) {
             System.out.println("Khong tim thay tu cua ban trong tu dien.");
-            return null;
         } else {
-            return word;
+            word.printInfor();
         }
     }
 
     private String getUserWord(String s) {
         if (s.equals("find")) {
             System.out.print("Nhap tu ban muon tim: ");
+        } else if (s.equals("add")) {
+            System.out.print("Nhap tu ban muon them: ");
         } else if (s.equals("edit")) {
             System.out.print("Nhap tu ban muon sua: ");
         } else if (s.equals("erase")) {
             System.out.print("Nhap tu ban muon xoa: ");
+        } else if (s.equals("confirm")) {
+            System.out.print("Xac nhan thao tac (yes/no): ");
+        } else if (s.equals("try again")) {
+            System.out.print("Thuc hien lai thao tac (yes/no): ");
         } else {
             System.out.print("Thao tac khong ton tai!!!");
             return "";
         }
         String word;
         word = scanner.nextLine();
-        return word;
+        return word.toLowerCase();
     }
 
     private Word findWordInDictionary(String word) {
         for (Word i : words) {
-            if(Objects.equals(word.toLowerCase(), i.getWord_target().toLowerCase())) {
+            if(Objects.equals(word, i.getWord_target().toLowerCase())) {
                 return i;
             }
         }
         return null;
     }
 
-    public ArrayList<Word> dictionarySearcher() {
+    public void dictionarySearcher() {
         String s = getUserWord("find");
-        s = s.toLowerCase();
         ArrayList<Word> a1 = new ArrayList<Word>();
         ArrayList<Word> a2 = new ArrayList<Word>();
         ArrayList<Word> a3 = new ArrayList<Word>();
@@ -134,16 +138,14 @@ public class DictionaryManagement extends Dictionary {
         }
         a1.addAll(a2);
         a1.addAll(a3);
-        return a1;
+        DictionaryCommandline.showAllWords(a1);
     }
 
     public void add() throws IOException {
-        System.out.print("Tu cua ban dang muon them la: ");
-        String newTarget = scanner.nextLine();
+        String newTarget = getUserWord("add");
         if (findWordInDictionary(newTarget) != null) {
             System.out.println("Tu nay da co trong he thong !!!");
-            System.out.print("Nhan 'yes' de them tu khac, nhan 'no' de huy: ");
-            String cf = scanner.nextLine();
+            String cf = getUserWord("try again");
             if (cf.equals("yes")) {
                 add();
             }
@@ -159,8 +161,9 @@ public class DictionaryManagement extends Dictionary {
     }
 
     public void edit() throws IOException {
-        Word userWord = dictionaryLookup("edit");
+        Word userWord = findWordInDictionary(getUserWord("edit"));
         if (userWord == null) {
+            System.out.println("Tu nay khong co trong he thong!!!");
             return;
         }
         System.out.print("Tu cua ban dang muon sua la: ");
@@ -177,14 +180,14 @@ public class DictionaryManagement extends Dictionary {
     }
 
     public void erase() throws IOException {
-        Word userWord = dictionaryLookup("erase");
+        Word userWord = findWordInDictionary(getUserWord("erase"));
         if (userWord == null) {
+            System.out.println("Tu nay khong co trong he thong!!!");
             return;
         }
         System.out.print("Tu cua ban dang muon xoa la: ");
         userWord.printInfor();
-        System.out.print("Nhan 'yes' de xac nhan xoa, 'no' de huy: ");
-        String cf = scanner.nextLine();
+        String cf = getUserWord("confirm");
         if (!cf.equals("yes")) {
             System.out.println("Da huy thao tac xoa!!!");
             return;
