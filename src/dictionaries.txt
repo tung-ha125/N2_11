@@ -1,3 +1,2 @@
-apple	tao
-orange	cam
-banana	chuoi
+cat	mèo
+
