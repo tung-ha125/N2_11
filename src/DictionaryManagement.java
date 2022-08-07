@@ -2,7 +2,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
-import java.util.List;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,6 +10,9 @@ import java.nio.file.Paths;
 public class DictionaryManagement extends Dictionary {
 
     Scanner scanner = new Scanner(System.in);
+    DictionaryManagement() throws IOException {
+        insertFromFile();
+    }
 
     public void insertFromCommandline() {
         int n;
@@ -31,7 +33,6 @@ public class DictionaryManagement extends Dictionary {
 
             words.add(temp);
         }
-        //scanner.close();
     }
 
     public void insertFromFile() throws FileNotFoundException {
@@ -82,7 +83,7 @@ public class DictionaryManagement extends Dictionary {
         }
     }
 
-    private String getUserWord(String s) {
+    public String getUserWord(String s) {
         if (s.equals("find")) {
             System.out.print("Nhap tu ban muon tim: ");
         } else if (s.equals("add")) {
@@ -104,7 +105,7 @@ public class DictionaryManagement extends Dictionary {
         return word.toLowerCase();
     }
 
-    private Word findWordInDictionary(String word) {
+    protected Word findWordInDictionary(String word) {
         for (Word i : words) {
             if(Objects.equals(word, i.getWord_target().toLowerCase())) {
                 return i;
@@ -113,8 +114,7 @@ public class DictionaryManagement extends Dictionary {
         return null;
     }
 
-    public void dictionarySearcher() {
-        String s = getUserWord("find");
+    public ArrayList<Word> dictionarySearcher(String s) {
         ArrayList<Word> a1 = new ArrayList<Word>();
         ArrayList<Word> a2 = new ArrayList<Word>();
         ArrayList<Word> a3 = new ArrayList<Word>();
@@ -138,7 +138,7 @@ public class DictionaryManagement extends Dictionary {
         }
         a1.addAll(a2);
         a1.addAll(a3);
-        DictionaryCommandline.showAllWords(a1);
+        return a1;
     }
 
     public void add() throws IOException {
@@ -202,12 +202,12 @@ public class DictionaryManagement extends Dictionary {
 
     private final static Charset ENCODING = StandardCharsets.UTF_8;
 
-    private ArrayList<String> readSmallTextFile(String fileName) throws IOException {
+    ArrayList<String> readSmallTextFile(String fileName) throws IOException {
         Path path = Paths.get(fileName);
         return new ArrayList<String>(Files.readAllLines(path, ENCODING));
     }
 
-    private void writeSmallTextFile(ArrayList<String> lines, String fileName) throws IOException {
+    public void writeSmallTextFile(ArrayList<String> lines, String fileName) throws IOException {
         Path path = Paths.get(fileName);
         Files.write(path, lines, ENCODING);
     }
@@ -222,3 +222,4 @@ public class DictionaryManagement extends Dictionary {
         System.out.println("Successfully export to src/dictionaries.txt");
     }
 }
+
