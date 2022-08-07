@@ -1,13 +1,14 @@
 import javax.swing.*;
+import javax.swing.text.Document;
+import javax.swing.text.EditorKit;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.font.TextAttribute;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Map;
-
-import static java.awt.Font.getFont;
 
 
 public class DictionaryApplication extends DictionaryCommandline implements ActionListener {
@@ -28,7 +29,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
     private final JButton searchButton = new JButton("Search");
 
     private JTextField searchField = new JTextField();
-    private JTextArea translateArea = new JTextArea("Translate");
+    private JTextPane translateArea = new JTextPane();
 
     private JScrollPane translateScroll = new JScrollPane(translateArea);
 
@@ -91,7 +92,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
     }
 
     /**
-     * render phần translate
+     * render phần translate.
      */
     private void renderTranslateSide() {
         translatePanel.setBackground(Color.WHITE);
@@ -99,11 +100,11 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         translatePanel.setBounds(355, 25, 350, 600);
         translatePanel.setBorder(BorderFactory.createLineBorder(new Color(148, 143, 127)));
 
-
-        translateArea.setLineWrap(true);
-        translateArea.setWrapStyleWord(true);
-        translateArea.setFont(new Font("Arial", Font.PLAIN, 20));
+//        translateArea.setLineWrap(true);
+//        translateArea.setWrapStyleWord(true);
+        translateArea.setFont(new Font("Arial", Font.PLAIN, 30));
         translateArea.setEditable(false);
+        translateArea.setContentType("text/html");
 
         translateScroll.setPreferredSize(new Dimension(350, 500));
         translateScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -225,15 +226,13 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
 
         JPanel definitionPanel = new JPanel(new GridBagLayout());
 
-        JLabel editedWordLabel = new JLabel("Edited Word:                                                                      ");
+        JLabel editedWordLabel = new JLabel("Edited Word :                                                                      ");
         JLabel newWordLabel = new JLabel("English :                                                                    ");
         JLabel definitionLabel = new JLabel("Vietnamese :                                                                      ");
 
         JTextField editedField = new JTextField();
         JTextField newWordField = new JTextField();
         JTextArea definitionField = new JTextArea();
-
-        JButton addButton = new JButton("Edit");
 
         subFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         subFrame.setSize(frameWidth, frameHeight);
@@ -345,7 +344,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         if (word == null) {
             translateArea.setText("Không tìm thấy");
         } else {
-            translateArea.setText(word.word_explain);
+            translateArea.setText("<html> <h1>" + word.word_target + "</h1>" + word.word_explain + "</html>");
         }
     }
     
@@ -417,5 +416,18 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         c.gridy = gy;
         c.weightx = wx;
         c.weighty = wy;
+    }
+
+    public static final String html2text(String html) {
+        EditorKit kit = new HTMLEditorKit();
+        Document doc = kit.createDefaultDocument();
+        doc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+        try {
+            Reader reader = new StringReader(html);
+            kit.read(reader, doc, 0);
+            return doc.getText(0, doc.getLength());
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

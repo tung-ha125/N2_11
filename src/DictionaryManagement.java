@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Scanner;
 import java.nio.charset.Charset;
@@ -34,7 +33,6 @@ public class DictionaryManagement extends Dictionary {
 
             words.add(temp);
         }
-        //scanner.close();
     }
 
     public void insertFromFile() throws FileNotFoundException {
@@ -224,3 +222,4 @@ public class DictionaryManagement extends Dictionary {
         System.out.println("Successfully export to src/dictionaries.txt");
     }
 }
+
