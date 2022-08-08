@@ -5,9 +5,10 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import com.sun.speech.freetts.VoiceManager;
 
@@ -29,6 +30,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
 
     private final JButton searchButton = new JButton("Search");
     private final JButton spellButton = new JButton("Spell");
+    private final JButton translateButton = new JButton("GGtranslate");
 
     private JTextField searchField = new JTextField();
     private JTextPane translateArea = new JTextPane();
@@ -95,9 +97,23 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
 
         spellButton.addActionListener(e -> speech());
 
+        translateButton.setBackground(Color.CYAN);
+        translateButton.setPreferredSize(new Dimension(80, 30));
+        translateButton.setBounds(0, searchField.getY() + searchField.getHeight(), 80, 30);
+        translateButton.setFocusable(false);
+
+        translateButton.addActionListener(e -> {
+            try {
+                translateArea.setText(translate("en", "vi", searchField.getText()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
         searchPanel.add(spellButton);
+        searchPanel.add(translateButton);
         subPanel.add(searchPanel);
     }
 
@@ -367,6 +383,25 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         syntheticVoice.speak(userWord);
         syntheticVoice.deallocate();
 
+    }
+
+    private static String translate(String langFrom, String langTo, String text) throws IOException {
+        // INSERT YOU URL HERE
+        String urlStr = "https://script.google.com/macros/s/AKfycbxLvaPEKedcmyfKsKNn6fXKNri8nWowekZF8uNAWKY0lM7JJL9E-BGj9T31lxrn0cRGfQ/exec" +
+                "?q=" + URLEncoder.encode(text, "UTF-8") +
+                "&target=" + langTo +
+                "&source=" + langFrom;
+        URL url = new URL(urlStr);
+        StringBuilder response = new StringBuilder();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        return response.toString();
     }
     
     @Override
