@@ -1,3 +1,4 @@
+import com.sun.speech.freetts.VoiceManager;
 import javax.swing.*;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
@@ -5,9 +6,10 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -16,7 +18,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
     private final JFrame mainFrame = new JFrame("Dictionary");
 
     private final JPanel subPanel = new JPanel(new GridBagLayout());
-    private final JPanel searchPanel = new JPanel();
+    private final JPanel searchPanel = new JPanel(new GridLayout());
     private final JPanel translatePanel = new JPanel();
 
     private final JMenuBar menuBar = new JMenuBar();
@@ -25,15 +27,27 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
     private final JMenuItem addMenu = new JMenuItem("Add");
     private final JMenuItem editMenu = new JMenuItem("Edit");
     private final JMenuItem eraseMenu = new JMenuItem("Erase");
+    private final JMenuItem GGTranslateMenu = new JMenuItem("GG Translate");
 
     private final JButton searchButton = new JButton("Search");
+
+    private final JButton spellButton = new JButton("Spell");
 
     private JTextField searchField = new JTextField();
     private JTextPane translateArea = new JTextPane();
 
-    private JScrollPane translateScroll = new JScrollPane(translateArea);
+    private JScrollPane translateScroll = new JScrollPane(translateArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
+    JScrollPane suggestionScroll = new JScrollPane();
+    JPanel suggestionPanel = new JPanel(new FlowLayout());
+    private final int MAX_BUTTON_NUMS = 20;
+    JButton[] buttons = new JButton[MAX_BUTTON_NUMS];
 
+    private int FRAME_WIDTH = 1000;
+    private int FRAME_HEIGHT = 650;
+
+    private int SEARCH_SIDE_WIDTH = 350;
+    private int SEARCH_SIDE_HEIGHT = 600;
     DictionaryApplication() throws IOException {
         dictionaryBasic();
         sortDictionary();
@@ -52,7 +66,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
      */
     private void setUpMainFrame() {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(705, 650);
+        mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         mainFrame.setResizable(false);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setLayout(new FlowLayout());
@@ -60,7 +74,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         mainFrame.setBackground(Color.LIGHT_GRAY);
 
         subPanel.setLayout(null);
-        subPanel.setPreferredSize(new Dimension(705, 650));
+        subPanel.setPreferredSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
         subPanel.setBackground(Color.LIGHT_GRAY);
         mainFrame.add(subPanel);
         mainFrame.pack();
@@ -71,12 +85,12 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
      */
     private void renderSearchSide() {
         searchPanel.setBackground(Color.WHITE);
-        searchPanel.setBounds(0, 25, 350, 600);
+        searchPanel.setBounds(0, 25, SEARCH_SIDE_WIDTH, SEARCH_SIDE_HEIGHT);
         searchPanel.setLayout(new FlowLayout());
         searchPanel.setBorder(BorderFactory.createLineBorder(new Color(127, 138, 148)));
 
-        searchField.setPreferredSize(new Dimension(350, 50));
-        searchField.setBounds(0, 0, 350, 50);
+        searchField.setPreferredSize(new Dimension(SEARCH_SIDE_WIDTH, 50));
+        searchField.setBounds(0, 0, SEARCH_SIDE_WIDTH, 50);
         searchField.setBorder(BorderFactory.createLineBorder(new Color(127, 138, 148)));
 
         searchButton.setBackground(Color.CYAN);
@@ -85,9 +99,30 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         searchButton.setFocusable(false);
 
         searchButton.addActionListener(e -> search());
+        suggestionScroll.setPreferredSize(new Dimension(SEARCH_SIDE_WIDTH, 500));
+        suggestionScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
+            buttons[i] = new JButton();
+            buttons[i].setVisible(false);
+            buttons[i].setFocusable(false);
+            buttons[i].setPreferredSize(new Dimension(searchPanel.getWidth(), 50));
+            buttons[i].setBackground(Color.WHITE);
+            buttons[i].setBorder(BorderFactory.createEtchedBorder());
+            suggestionPanel.add(buttons[i]);
+        }
+        suggestionPanel.setPreferredSize(new Dimension(suggestionScroll.getWidth(), 1000));
+        suggestionScroll.setViewportView(suggestionPanel);
+
+        spellButton.setBackground(Color.CYAN);
+        spellButton.setPreferredSize(new Dimension(80, 30));
+        spellButton.setBounds(0, searchField.getY() + searchField.getHeight(), 80, 30);
+        spellButton.setFocusable(false);
+        spellButton.addActionListener(e -> speech(searchField.getText()));
 
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
+        searchPanel.add(spellButton);
+        searchPanel.add(suggestionScroll);
         subPanel.add(searchPanel);
     }
 
@@ -96,17 +131,15 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
      */
     private void renderTranslateSide() {
         translatePanel.setBackground(Color.WHITE);
-        translatePanel.setPreferredSize(new Dimension(350, 600));
-        translatePanel.setBounds(355, 25, 350, 600);
+        //translatePanel.setPreferredSize(new Dimension(350, 600));
+        translatePanel.setBounds(355, 25, 650, 600);
         translatePanel.setBorder(BorderFactory.createLineBorder(new Color(148, 143, 127)));
 
-//        translateArea.setLineWrap(true);
-//        translateArea.setWrapStyleWord(true);
         translateArea.setFont(new Font("Arial", Font.PLAIN, 30));
         translateArea.setEditable(false);
         translateArea.setContentType("text/html");
 
-        translateScroll.setPreferredSize(new Dimension(350, 500));
+        translateScroll.setPreferredSize(new Dimension(650, 570));
         translateScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         translatePanel.add(translateScroll);
@@ -117,10 +150,12 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         addMenu.addActionListener(this);
         editMenu.addActionListener(this);
         eraseMenu.addActionListener(this);
+        GGTranslateMenu.addActionListener(this);
 
         featuresMenu.add(addMenu);
         featuresMenu.add(editMenu);
         featuresMenu.add(eraseMenu);
+        featuresMenu.add(GGTranslateMenu);
 
         menuBar.add(featuresMenu);
 
@@ -188,7 +223,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                 JOptionPane.showMessageDialog(null, "Từ này đã có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
             } else {
                 String path = "src/dictionaries.txt";
-                words.add(new Word(newWordField.getText(), definitionField.getText()));
+                words.add(new Word(newWordField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"));
                 ArrayList<String> S = null;
                 try {
                     S = readSmallTextFile(path);
@@ -280,7 +315,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                 JOptionPane.showMessageDialog(null, "Từ này không có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
             } else {
                 String path = "src/dictionaries.txt";
-                Word newWord = new Word(newWordField.getText(), definitionField.getText()); //transform text to Word Object
+                Word newWord = new Word(newWordField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"); //transform text to Word Object
                 int x = editWordInFile(path, wordInList, newWord); //update word in file
                 changeWordInCurrentArrayList(x, newWord); //update word in ArrayList
                 JOptionPane.showMessageDialog(null, "Thao tác sửa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
@@ -338,14 +373,133 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         subFrame.add(subPanel);
     }
 
+    private void GGTranslateMenu() {
+        final int frameWidth = 670;
+        final int frameHeight = 670;
+        JFrame subFrame = new JFrame("GG Translate");
+
+        subFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        subFrame.setSize(frameWidth, frameHeight);
+        subFrame.setVisible(true);
+        subFrame.setLocationRelativeTo(null);
+
+        JPanel subPanel = new JPanel(new GridLayout());
+        JPanel searchPanel = new JPanel(new FlowLayout());
+        JPanel translatePanel = new JPanel(new FlowLayout());
+        searchPanel.setBorder(BorderFactory.createEtchedBorder());
+
+        final JTextArea searchArea = new JTextArea();
+        searchArea.setFont(new Font("Arial", Font.PLAIN, 20));
+        searchArea.setEditable(true);
+        searchArea.setLineWrap(true);
+        searchArea.setWrapStyleWord(true);
+
+        final JScrollPane searchScroll = new JScrollPane(searchArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        searchScroll.setPreferredSize(new Dimension(300, 550));
+        searchScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        final JButton searchButton = new JButton("Search Text");
+        searchButton.setPreferredSize(new Dimension(300, 50));
+        searchButton.setFocusable(false);
+        searchButton.setHorizontalTextPosition(JButton.CENTER);
+        searchButton.setVerticalTextPosition(JButton.CENTER);
+
+        final JTextArea translateArea = new JTextArea();
+        translateArea.setFont(new Font("Arial", Font.PLAIN, 20));
+        translateArea.setEditable(false);
+        translateArea.setLineWrap(true);
+        translateArea.setWrapStyleWord(true);
+
+        final JScrollPane translateScroll = new JScrollPane(translateArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        translateScroll.setPreferredSize(new Dimension(300, 550));
+        translateScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        final JButton spellButton = new JButton("Spell");
+        spellButton.setPreferredSize(new Dimension(300, 50));
+        spellButton.setFocusable(false);
+        spellButton.setHorizontalTextPosition(JButton.CENTER);
+        spellButton.setVerticalTextPosition(JButton.CENTER);
+        spellButton.addActionListener(e -> speech(searchArea.getText()));
+
+        searchButton.addActionListener(e -> {
+            try {
+                translateArea.setText(translate("en", "vi", searchArea.getText()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        searchPanel.add(searchScroll);
+        searchPanel.add(searchButton);
+
+        translatePanel.add(translateScroll);
+        translatePanel.add(spellButton);
+
+        subPanel.add(searchPanel);
+        subPanel.add(translatePanel);
+
+        subFrame.add(subPanel);
+    }
+
     private void search() {
         String userWord = searchField.getText();
-        Word word = findWordInDictionary(userWord);
-        if (word == null) {
+        ArrayList<Word> tempWords = dictionarySearcher(userWord);
+        if (tempWords.size() == 0) {
             translateArea.setText("Không tìm thấy");
+            for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
+                buttons[i].setEnabled(false);
+                buttons[i].setVisible(false);
+            }
         } else {
-            translateArea.setText("<html> <h1>" + word.word_target + "</h1>" + word.word_explain + "</html>");
+            System.out.println(tempWords.size());
+            for (int i = 0; i < tempWords.size(); i++) {
+                buttons[i].setText(tempWords.get(i).word_target);
+                int finalI1 = i;
+                ActionListener[] listeners = buttons[i].getActionListeners();
+                for (ActionListener l : listeners) {
+                    buttons[i].removeActionListener(l);
+                }
+                buttons[i].addActionListener(e->{
+                    Word word = tempWords.get(finalI1);
+                    translateArea.setText("<html> <h1>" + word.word_target + "  " + word.word_pronounce + "</h1>" + word.word_explain + "</html>");
+                });
+                buttons[i].setVisible(true);
+                buttons[i].setEnabled(true);
+            }
+
+            for (int i = tempWords.size(); i < MAX_BUTTON_NUMS; i++) {
+                buttons[i].setEnabled(false);
+                buttons[i].setVisible(false);
+            }
         }
+    }
+
+    private void speech(String speechText) {
+        System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
+        VoiceManager voiceManager = VoiceManager.getInstance();
+        com.sun.speech.freetts.Voice syntheticVoice = voiceManager.getVoice("kevin16");
+        syntheticVoice.allocate();
+        syntheticVoice.speak(speechText);
+        syntheticVoice.deallocate();
+    }
+
+    private static String translate(String langFrom, String langTo, String text) throws IOException {
+        // INSERT YOU URL HERE
+        String urlStr = "https://script.google.com/macros/s/AKfycbxLvaPEKedcmyfKsKNn6fXKNri8nWowekZF8uNAWKY0lM7JJL9E-BGj9T31lxrn0cRGfQ/exec" +
+                "?q=" + URLEncoder.encode(text, "UTF-8") +
+                "&target=" + langTo +
+                "&source=" + langFrom;
+        URL url = new URL(urlStr);
+        StringBuilder response = new StringBuilder();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        return response.toString();
     }
     
     @Override
@@ -370,6 +524,9 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+        }
+        if (e.getSource() == GGTranslateMenu) {
+            GGTranslateMenu();
         }
     }
 
