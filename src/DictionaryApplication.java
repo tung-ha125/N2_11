@@ -1,11 +1,12 @@
 import com.sun.speech.freetts.VoiceManager;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -69,8 +70,8 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         mainFrame.setResizable(false);
         mainFrame.setLocationRelativeTo(null);
-        mainFrame.setLayout(new FlowLayout());
         mainFrame.setVisible(true);
+        mainFrame.setLayout(new FlowLayout());
         mainFrame.setBackground(Color.LIGHT_GRAY);
 
         subPanel.setLayout(null);
@@ -92,13 +93,35 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         searchField.setPreferredSize(new Dimension(SEARCH_SIDE_WIDTH, 50));
         searchField.setBounds(0, 0, SEARCH_SIDE_WIDTH, 50);
         searchField.setBorder(BorderFactory.createLineBorder(new Color(127, 138, 148)));
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchByPreFix();
+            }
 
-        searchButton.setBackground(Color.CYAN);
-        searchButton.setPreferredSize(new Dimension(80, 30));
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchByPreFix();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchByPreFix();
+            }
+        });
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    search();
+                }
+            }
+        });
+
+        setButton(searchButton, 80, 30);
         searchButton.setBounds(0, searchField.getY() + searchField.getHeight(), 80, 30);
-        searchButton.setFocusable(false);
-
         searchButton.addActionListener(e -> search());
+
         suggestionScroll.setPreferredSize(new Dimension(SEARCH_SIDE_WIDTH, 500));
         suggestionScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
@@ -113,10 +136,8 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         suggestionPanel.setPreferredSize(new Dimension(suggestionScroll.getWidth(), 1000));
         suggestionScroll.setViewportView(suggestionPanel);
 
-        spellButton.setBackground(Color.CYAN);
-        spellButton.setPreferredSize(new Dimension(80, 30));
+        setButton(spellButton, 80, 30);
         spellButton.setBounds(0, searchField.getY() + searchField.getHeight(), 80, 30);
-        spellButton.setFocusable(false);
         spellButton.addActionListener(e -> speech(searchField.getText()));
 
         searchPanel.add(searchField);
@@ -131,7 +152,6 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
      */
     private void renderTranslateSide() {
         translatePanel.setBackground(Color.WHITE);
-        //translatePanel.setPreferredSize(new Dimension(350, 600));
         translatePanel.setBounds(355, 25, 650, 600);
         translatePanel.setBorder(BorderFactory.createLineBorder(new Color(148, 143, 127)));
 
@@ -172,7 +192,6 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         final int frameHeight = 300;
 
         JFrame subFrame = new JFrame("Add");
-        //subFrame.setLayout();
 
         JPanel subPanel = new JPanel(new GridBagLayout());
         JPanel newWordPanel = new JPanel(new GridLayout(2, 0));
@@ -185,11 +204,12 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         JTextArea definitionField = new JTextArea();
 
         JButton addButton = new JButton("Add");
+        addButton.setFocusable(false);
 
-        subFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setVisible(true);
+        subFrame.setResizable(false);
         subFrame.setLocationRelativeTo(null);
+        subFrame.setVisible(true);
 
         definitionField.setLineWrap(true);
         definitionField.setWrapStyleWord(true);
@@ -219,7 +239,8 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         subPanel.add(definitionPanel, gbc);
 
         addButton.addActionListener(e-> {
-            if (findWordInDictionary(newWordField.getText()) != null) {
+            Word word = findWordInDictionary(newWordField.getText());
+            if (word != null && word.word_explain.equals(definitionField.getText())) {
                 JOptionPane.showMessageDialog(null, "Từ này đã có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
             } else {
                 String path = "src/dictionaries.txt";
@@ -237,6 +258,15 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                     throw new RuntimeException(ex);
                 }
                 JOptionPane.showMessageDialog(null, "Thêm từ thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
+            }
+        });
+
+        newWordField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    definitionField.requestFocus();
+                }
             }
         });
 
@@ -269,15 +299,16 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         JTextField newWordField = new JTextField();
         JTextArea definitionField = new JTextArea();
 
-        subFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setVisible(true);
+        subFrame.setResizable(false);
         subFrame.setLocationRelativeTo(null);
+        subFrame.setVisible(true);
 
         definitionField.setLineWrap(true);
         definitionField.setWrapStyleWord(true);
 
         JButton editedButton = new JButton("Add");
+        editedButton.setFocusable(false);
 
         editedWordPanel.add(editedWordLabel);
         editedWordPanel.add(editedField);
@@ -322,6 +353,24 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
             }
         });
 
+        editedField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    newWordField.requestFocus();
+                }
+            }
+        });
+
+        newWordField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    definitionField.requestFocus();
+                }
+            }
+        });
+
         subFrame.add(subPanel);
     }
 
@@ -343,6 +392,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         eraseField.setBorder(BorderFactory.createLineBorder(new Color(127, 138, 148)));
 
         JButton eraseButton = new JButton("Erase");
+        eraseButton.setFocusable(false);
         eraseButton.addActionListener(e -> {
             Word userWord = findWordInDictionary(eraseField.getText());
             if (userWord == null) {
@@ -359,10 +409,10 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
             }
         });
 
-        subFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setVisible(true);
+        subFrame.setResizable(false);
         subFrame.setLocationRelativeTo(null);
+        subFrame.setVisible(true);
 
         erasePanel.add(eraseLabel);
         erasePanel.add(eraseField);
@@ -378,10 +428,10 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         final int frameHeight = 670;
         JFrame subFrame = new JFrame("GG Translate");
 
-        subFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setVisible(true);
+        subFrame.setResizable(false);
         subFrame.setLocationRelativeTo(null);
+        subFrame.setVisible(true);
 
         JPanel subPanel = new JPanel(new GridLayout());
         JPanel searchPanel = new JPanel(new FlowLayout());
@@ -399,8 +449,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         searchScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         final JButton searchButton = new JButton("Search Text");
-        searchButton.setPreferredSize(new Dimension(300, 50));
-        searchButton.setFocusable(false);
+        setButton(searchButton, 300, 50);
         searchButton.setHorizontalTextPosition(JButton.CENTER);
         searchButton.setVerticalTextPosition(JButton.CENTER);
 
@@ -415,8 +464,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         translateScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         final JButton spellButton = new JButton("Spell");
-        spellButton.setPreferredSize(new Dimension(300, 50));
-        spellButton.setFocusable(false);
+        setButton(spellButton, 300, 50);
         spellButton.setHorizontalTextPosition(JButton.CENTER);
         spellButton.setVerticalTextPosition(JButton.CENTER);
         spellButton.addActionListener(e -> speech(searchArea.getText()));
@@ -441,8 +489,8 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         subFrame.add(subPanel);
     }
 
-    private void search() {
-        String userWord = searchField.getText();
+    private void searchByPreFix() {
+        String userWord = searchField.getText().trim();
         ArrayList<Word> tempWords = dictionarySearcher(userWord);
         if (tempWords.size() == 0) {
             translateArea.setText("Không tìm thấy");
@@ -461,7 +509,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                 }
                 buttons[i].addActionListener(e->{
                     Word word = tempWords.get(finalI1);
-                    translateArea.setText("<html> <h1>" + word.word_target + "  " + word.word_pronounce + "</h1>" + word.word_explain + "</html>");
+                    translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
                 });
                 buttons[i].setVisible(true);
                 buttons[i].setEnabled(true);
@@ -471,6 +519,20 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                 buttons[i].setEnabled(false);
                 buttons[i].setVisible(false);
             }
+        }
+    }
+
+    private void search() {
+        String userWord = searchField.getText().trim();
+        Word word = findWordInDictionary(userWord);
+        if (word == null) {
+            translateArea.setText("Không tìm thấy");
+            for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
+                buttons[i].setEnabled(false);
+                buttons[i].setVisible(false);
+            }
+        } else {
+            translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
         }
     }
 
@@ -586,5 +648,16 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         } catch (Exception e) {
             return "";
         }
+    }
+
+    private void setFrame(JFrame frame, int width, int height) {
+        frame.setSize(width, height);
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+    private void setButton(JButton button, int width, int height) {
+        button.setPreferredSize(new Dimension(width, height));
+        button.setFocusable(false);
     }
 }

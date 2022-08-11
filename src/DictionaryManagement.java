@@ -118,6 +118,9 @@ public class DictionaryManagement extends Dictionary {
         ArrayList<Word> a1 = new ArrayList<Word>();
         ArrayList<Word> a2 = new ArrayList<Word>();
         ArrayList<Word> a3 = new ArrayList<Word>();
+        if ("".equals(s.trim())) {
+            return a1;
+        }
         for (Word i : words) {
             String S = i.word_target;
             if (s.length() > S.length()) continue;
