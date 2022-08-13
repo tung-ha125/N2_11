@@ -1,3 +1,5 @@
+package Trie;
+
 import java.util.ArrayList;
 import java.util.List;
 

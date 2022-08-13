@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import Trie.Trie;
 
 
 public class DictionaryApplication extends DictionaryCommandline implements ActionListener {
