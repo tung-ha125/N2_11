@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Scanner;
 
 public class Dictionary {
     public static ArrayList<Word> words = new ArrayList<>();
@@ -9,7 +8,7 @@ public class Dictionary {
 
     }
 
-    public ArrayList<Word> getDic() {
+    public static ArrayList<Word> getDic() {
         return words;
     }
 
@@ -21,11 +20,18 @@ public class Dictionary {
         return words;
     }
 
+    public static Word getWordAt(int index) {
+        if (index < 0 || index >= words.size()) {
+            return null;
+        }
+        return words.get(index);
+    }
+
     public static void addWord(Word newWord) {
         words.add(newWord);
     }
 
-    public void removeWord(Word word) {
+    public static void removeWord(Word word) {
         //find word
         int index = words.indexOf(word);
         if (index > 0) {
@@ -33,13 +39,4 @@ public class Dictionary {
         }
     }
 
-    public void sortDictionary() {
-        Collections.sort(words, new cmpWord());
-    }
-}
-
-class cmpWord implements Comparator<Word> {
-    public int compare(Word w1, Word w2) {
-        return w1.getWord_target().compareTo(w2.getWord_target());
-    }
 }

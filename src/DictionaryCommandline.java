@@ -25,7 +25,7 @@ public class DictionaryCommandline extends DictionaryManagement {
     }
 
     public void dictionaryBasic() throws FileNotFoundException, IOException {
-        insertFromFile();
+
     }
 
     private void searchByPreFix() {
