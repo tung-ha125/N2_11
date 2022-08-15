@@ -12,9 +12,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
+import Trie.Trie;
 
 
-public class DictionaryApplication extends DictionaryCommandline implements ActionListener {
+public class DictionaryApplication extends DictionaryCommandline {
 
     private final JFrame mainFrame = new JFrame("Dictionary");
 
@@ -22,27 +24,20 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
     private final JPanel searchPanel = new JPanel(new GridLayout());
     private final JPanel translatePanel = new JPanel();
 
-    private final JMenuBar menuBar = new JMenuBar();
-
-    private final JMenu featuresMenu = new JMenu("Features");
-    private final JMenuItem addMenu = new JMenuItem("Add");
-    private final JMenuItem editMenu = new JMenuItem("Edit");
-    private final JMenuItem eraseMenu = new JMenuItem("Erase");
-    private final JMenuItem GGTranslateMenu = new JMenuItem("GG Translate");
-
     private final JButton searchButton = new JButton("Search");
 
     private final JButton spellButton = new JButton("Spell");
 
-    private JTextField searchField = new JTextField();
-    private JTextPane translateArea = new JTextPane();
+    private final JTextField searchField = new JTextField();
+    private final JTextPane translateArea = new JTextPane();
 
-    private JScrollPane translateScroll = new JScrollPane(translateArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    private final JScrollPane translateScroll = new JScrollPane(translateArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
     JScrollPane suggestionScroll = new JScrollPane();
-    JPanel suggestionPanel = new JPanel(new FlowLayout());
+    private final JPanel suggestionPanel = new JPanel(new FlowLayout());
     private final int MAX_BUTTON_NUMS = 20;
-    JButton[] buttons = new JButton[MAX_BUTTON_NUMS];
+    private final JButton[] buttons = new JButton[MAX_BUTTON_NUMS];
+    private final Menu menuBar = new Menu();
 
     private int FRAME_WIDTH = 1000;
     private int FRAME_HEIGHT = 650;
@@ -51,7 +46,6 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
     private int SEARCH_SIDE_HEIGHT = 600;
     DictionaryApplication() throws IOException {
         dictionaryBasic();
-        sortDictionary();
     }
 
     public void runApplication() {
@@ -167,331 +161,15 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
     }
 
     private void renderMenuBar() {
-        addMenu.addActionListener(this);
-        editMenu.addActionListener(this);
-        eraseMenu.addActionListener(this);
-        GGTranslateMenu.addActionListener(this);
-
-        featuresMenu.add(addMenu);
-        featuresMenu.add(editMenu);
-        featuresMenu.add(eraseMenu);
-        featuresMenu.add(GGTranslateMenu);
-
-        menuBar.add(featuresMenu);
-
         mainFrame.setJMenuBar(menuBar);
     }
-
-    /**
-     * Mở 1 cửa sổ nhỏ để thê từ
-     * @throws IOException
-     */
-    @Override
-    public void add() throws IOException {
-        final int frameWidth = 300;
-        final int frameHeight = 300;
-
-        JFrame subFrame = new JFrame("Add");
-
-        JPanel subPanel = new JPanel(new GridBagLayout());
-        JPanel newWordPanel = new JPanel(new GridLayout(2, 0));
-        JPanel definitionPanel = new JPanel(new GridBagLayout());
-
-        JLabel newWordLabel = new JLabel("New Word:                                                                    ");
-        JLabel definitionLabel = new JLabel("Definition                                                                      ");
-
-        JTextField newWordField = new JTextField();
-        JTextArea definitionField = new JTextArea();
-
-        JButton addButton = new JButton("Add");
-        addButton.setFocusable(false);
-
-        subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setResizable(false);
-        subFrame.setLocationRelativeTo(null);
-        subFrame.setVisible(true);
-
-        definitionField.setLineWrap(true);
-        definitionField.setWrapStyleWord(true);
-
-        newWordPanel.add(newWordLabel);
-        newWordPanel.add(newWordField);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-
-        changeGridBag(gbc, 0, 2, 0, 0);
-        subPanel.add(addButton, gbc);
-
-        changeGridBag(gbc, 0, 1, 1, 1);
-        newWordPanel.add(newWordField, gbc);
-
-        changeGridBag(gbc, 0, 0, 1, 0);
-        subPanel.add(newWordPanel, gbc);
-
-        changeGridBag(gbc, 0, 0, 1, 0);
-        definitionPanel.add(definitionLabel, gbc);
-
-        changeGridBag(gbc, 0, 1, 1, 1);
-        definitionPanel.add(definitionField, gbc);
-
-        changeGridBag(gbc, 0, 1, 1, 1);
-        subPanel.add(definitionPanel, gbc);
-
-        addButton.addActionListener(e-> {
-            Word word = findWordInDictionary(newWordField.getText());
-            if (word != null && word.word_explain.equals(definitionField.getText())) {
-                JOptionPane.showMessageDialog(null, "Từ này đã có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String path = "src/dictionaries.txt";
-                words.add(new Word(newWordField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"));
-                ArrayList<String> S = null;
-                try {
-                    S = readSmallTextFile(path);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                S.add(newWordField.getText() + '\t' + definitionField.getText());
-                try {
-                    writeSmallTextFile(S, path);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                JOptionPane.showMessageDialog(null, "Thêm từ thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
-            }
-        });
-
-        newWordField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-                    definitionField.requestFocus();
-                }
-            }
-        });
-
-        subFrame.add(subPanel);
-    }
-
-    /**
-     * Mở 1 cửa sổ nhỏ để sửa từ
-     * @throws IOException
-     */
-    @Override
-    public void edit() throws IOException {
-        final int frameWidth = 300;
-        final int frameHeight = 300;
-
-        JFrame subFrame = new JFrame("Edit");
-        //subFrame.setLayout();
-
-        JPanel subPanel = new JPanel(new GridBagLayout());
-        JPanel editedWordPanel = new JPanel(new GridLayout(2, 0));
-        JPanel newWordPanel = new JPanel(new GridLayout(2, 0));
-
-        JPanel definitionPanel = new JPanel(new GridBagLayout());
-
-        JLabel editedWordLabel = new JLabel("Edited Word :                                                                      ");
-        JLabel newWordLabel = new JLabel("English :                                                                    ");
-        JLabel definitionLabel = new JLabel("Vietnamese :                                                                      ");
-
-        JTextField editedField = new JTextField();
-        JTextField newWordField = new JTextField();
-        JTextArea definitionField = new JTextArea();
-
-        subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setResizable(false);
-        subFrame.setLocationRelativeTo(null);
-        subFrame.setVisible(true);
-
-        definitionField.setLineWrap(true);
-        definitionField.setWrapStyleWord(true);
-
-        JButton editedButton = new JButton("Add");
-        editedButton.setFocusable(false);
-
-        editedWordPanel.add(editedWordLabel);
-        editedWordPanel.add(editedField);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-
-        changeGridBag(gbc, 0, 3, 0, 0);
-        subPanel.add(editedButton, gbc);
-
-        changeGridBag(gbc, 0, 1, 1, 1);
-        editedWordPanel.add(editedField, gbc);
-
-        changeGridBag(gbc, 0, 0, 1, 0);
-        subPanel.add(editedWordPanel, gbc);
-
-        newWordPanel.add(newWordLabel);
-        newWordPanel.add(newWordField);
-
-        changeGridBag(gbc, 0, 1, 1, 0);
-        subPanel.add(newWordPanel, gbc);
-
-        changeGridBag(gbc, 0, 0, 1, 0);
-        definitionPanel.add(definitionLabel, gbc);
-
-        changeGridBag(gbc, 0, 1, 1, 1);
-        definitionPanel.add(definitionField, gbc);
-
-        changeGridBag(gbc, 0, 2, 1, 1);
-        subPanel.add(definitionPanel, gbc);
-
-        editedButton.addActionListener(e -> {
-            Word wordInList = findWordInDictionary(editedField.getText());
-            if (wordInList == null) {
-                JOptionPane.showMessageDialog(null, "Từ này không có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String path = "src/dictionaries.txt";
-                Word newWord = new Word(newWordField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"); //transform text to Word Object
-                int x = editWordInFile(path, wordInList, newWord); //update word in file
-                changeWordInCurrentArrayList(x, newWord); //update word in ArrayList
-                JOptionPane.showMessageDialog(null, "Thao tác sửa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
-            }
-        });
-
-        editedField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-                    newWordField.requestFocus();
-                }
-            }
-        });
-
-        newWordField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-                    definitionField.requestFocus();
-                }
-            }
-        });
-
-        subFrame.add(subPanel);
-    }
-
-    /**
-     * Mở 1 cửa sổ nhỏ để xóa từ
-     * @throws IOException
-     */
-    @Override
-    public void erase() throws IOException {
-        final int frameWidth = 300;
-        final int frameHeight = 300;
-
-        JFrame subFrame = new JFrame("Erase");
-        JPanel subPanel = new JPanel(new FlowLayout());
-
-        JPanel erasePanel = new JPanel(new GridLayout(2, 0));
-        JLabel eraseLabel = new JLabel("Word to erase:                                                                  ");
-        JTextArea eraseField = new JTextArea();
-        eraseField.setBorder(BorderFactory.createLineBorder(new Color(127, 138, 148)));
-
-        JButton eraseButton = new JButton("Erase");
-        eraseButton.setFocusable(false);
-        eraseButton.addActionListener(e -> {
-            Word userWord = findWordInDictionary(eraseField.getText());
-            if (userWord == null) {
-                JOptionPane.showMessageDialog(null, "Từ này không có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String path = "src/dictionaries.txt";
-                try {
-                    eraseWordInFile(path, userWord);
-                    eraseWordInCurrentArrayList(userWord);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                JOptionPane.showMessageDialog(null, "Thao tác xóa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
-            }
-        });
-
-        subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setResizable(false);
-        subFrame.setLocationRelativeTo(null);
-        subFrame.setVisible(true);
-
-        erasePanel.add(eraseLabel);
-        erasePanel.add(eraseField);
-
-        subPanel.add(erasePanel);
-        subPanel.add(eraseButton);
-
-        subFrame.add(subPanel);
-    }
-
-    private void GGTranslateMenu() {
-        final int frameWidth = 670;
-        final int frameHeight = 670;
-        JFrame subFrame = new JFrame("GG Translate");
-
-        subFrame.setSize(frameWidth, frameHeight);
-        subFrame.setResizable(false);
-        subFrame.setLocationRelativeTo(null);
-        subFrame.setVisible(true);
-
-        JPanel subPanel = new JPanel(new GridLayout());
-        JPanel searchPanel = new JPanel(new FlowLayout());
-        JPanel translatePanel = new JPanel(new FlowLayout());
-        searchPanel.setBorder(BorderFactory.createEtchedBorder());
-
-        final JTextArea searchArea = new JTextArea();
-        searchArea.setFont(new Font("Arial", Font.PLAIN, 20));
-        searchArea.setEditable(true);
-        searchArea.setLineWrap(true);
-        searchArea.setWrapStyleWord(true);
-
-        final JScrollPane searchScroll = new JScrollPane(searchArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        searchScroll.setPreferredSize(new Dimension(300, 550));
-        searchScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-        final JButton searchButton = new JButton("Search Text");
-        setButton(searchButton, 300, 50);
-        searchButton.setHorizontalTextPosition(JButton.CENTER);
-        searchButton.setVerticalTextPosition(JButton.CENTER);
-
-        final JTextArea translateArea = new JTextArea();
-        translateArea.setFont(new Font("Arial", Font.PLAIN, 20));
-        translateArea.setEditable(false);
-        translateArea.setLineWrap(true);
-        translateArea.setWrapStyleWord(true);
-
-        final JScrollPane translateScroll = new JScrollPane(translateArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        translateScroll.setPreferredSize(new Dimension(300, 550));
-        translateScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-        final JButton spellButton = new JButton("Spell");
-        setButton(spellButton, 300, 50);
-        spellButton.setHorizontalTextPosition(JButton.CENTER);
-        spellButton.setVerticalTextPosition(JButton.CENTER);
-        spellButton.addActionListener(e -> speech(searchArea.getText()));
-
-        searchButton.addActionListener(e -> {
-            try {
-                translateArea.setText(translate("en", "vi", searchArea.getText()));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
-
-        searchPanel.add(searchScroll);
-        searchPanel.add(searchButton);
-
-        translatePanel.add(translateScroll);
-        translatePanel.add(spellButton);
-
-        subPanel.add(searchPanel);
-        subPanel.add(translatePanel);
-
-        subFrame.add(subPanel);
-    }
-
     private void searchByPreFix() {
         String userWord = searchField.getText().trim();
-        ArrayList<Word> tempWords = dictionarySearcher(userWord);
+        List<Integer> tmp = Trie.searchPrefixOfWord(userWord.toLowerCase(), MAX_BUTTON_NUMS);
+        ArrayList<Word> tempWords = new ArrayList<Word>();
+        for (Integer it : tmp) {
+            tempWords.add(Dictionary.getWordAt(it));
+        }
         if (tempWords.size() == 0) {
             translateArea.setText("Không tìm thấy");
             for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
@@ -499,8 +177,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                 buttons[i].setVisible(false);
             }
         } else {
-            System.out.println(tempWords.size());
-            for (int i = 0; i < tempWords.size(); i++) {
+            for (int i = 0; i < Math.min(tempWords.size(), MAX_BUTTON_NUMS); i++) {
                 buttons[i].setText(tempWords.get(i).word_target);
                 int finalI1 = i;
                 ActionListener[] listeners = buttons[i].getActionListeners();
@@ -524,7 +201,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
 
     private void search() {
         String userWord = searchField.getText().trim();
-        Word word = findWordInDictionary(userWord);
+        Word word = Dictionary.getWordAt(Trie.searchAWord(userWord.toLowerCase()));
         if (word == null) {
             translateArea.setText("Không tìm thấy");
             for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
@@ -536,7 +213,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         }
     }
 
-    private void speech(String speechText) {
+    public static void speech(String speechText) {
         System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
         VoiceManager voiceManager = VoiceManager.getInstance();
         com.sun.speech.freetts.Voice syntheticVoice = voiceManager.getVoice("kevin16");
@@ -545,7 +222,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         syntheticVoice.deallocate();
     }
 
-    private static String translate(String langFrom, String langTo, String text) throws IOException {
+    public static String translate(String langFrom, String langTo, String text) throws IOException {
         // INSERT YOU URL HERE
         String urlStr = "https://script.google.com/macros/s/AKfycbxLvaPEKedcmyfKsKNn6fXKNri8nWowekZF8uNAWKY0lM7JJL9E-BGj9T31lxrn0cRGfQ/exec" +
                 "?q=" + URLEncoder.encode(text, "UTF-8") +
@@ -564,73 +241,8 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         return response.toString();
     }
     
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == addMenu) {
-            try {
-                add();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        if (e.getSource() == editMenu) {
-            try {
-                edit();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        if(e.getSource() == eraseMenu) {
-            try {
-                erase();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        if (e.getSource() == GGTranslateMenu) {
-            GGTranslateMenu();
-        }
-    }
 
-    public void eraseWordInFile(String path, Word erasedWord) throws IOException {
-        ArrayList<String> S = null;
-        S = readSmallTextFile(path);
-        int x = S.indexOf(erasedWord.word_target + '\t' + erasedWord.word_explain);
-        S.remove(x);
-        writeSmallTextFile(S, path);
-    }
-
-    public void eraseWordInCurrentArrayList(Word erasedWord) throws IOException {
-        int index = words.indexOf(erasedWord);
-        words.remove(index);
-    }
-
-    public int editWordInFile(String path, Word wordInList, Word newWord) {
-        ArrayList<String> S = null;
-        try {
-            S = readSmallTextFile(path);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        int x = S.indexOf(wordInList.word_target + '\t' + wordInList.word_explain);
-        S.set(x, S.get(x).replace(wordInList.word_explain, newWord.word_explain));
-        S.set(x, S.get(x).replace(wordInList.word_target, newWord.word_target));
-        try {
-            writeSmallTextFile(S, path);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        return x;
-    }
-
-    public void changeWordInCurrentArrayList(int index, Word newWord) {
-        words.get(index).word_target = newWord.word_target;
-        words.get(index).word_explain = newWord.word_explain;
-    }
-
-
-
-    void changeGridBag(GridBagConstraints c, int gx, int gy, int wx, int wy) {
+    public static void changeGridBag(GridBagConstraints c, int gx, int gy, int wx, int wy) {
         c.gridx = gx;
         c.gridy = gy;
         c.weightx = wx;
@@ -650,13 +262,19 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         }
     }
 
-    private void setFrame(JFrame frame, int width, int height) {
+    public static void setFrame(JFrame frame, int width, int height) {
         frame.setSize(width, height);
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-    private void setButton(JButton button, int width, int height) {
+
+    public static void setField(JTextArea tx) {
+        tx.setLineWrap(true);
+        tx.setWrapStyleWord(true);
+    }
+
+    public static void setButton(JButton button, int width, int height) {
         button.setPreferredSize(new Dimension(width, height));
         button.setFocusable(false);
     }
