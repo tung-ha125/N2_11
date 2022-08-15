@@ -278,16 +278,13 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
 
         JPanel subPanel = new JPanel(new GridBagLayout());
         JPanel editedWordPanel = new JPanel(new GridLayout(2, 0));
-        JPanel newWordPanel = new JPanel(new GridLayout(2, 0));
 
         JPanel definitionPanel = new JPanel(new GridBagLayout());
 
-        JLabel editedWordLabel = new JLabel("Edited Word :                                                                      ");
-        JLabel newWordLabel = new JLabel("English :                                                                    ");
-        JLabel definitionLabel = new JLabel("Vietnamese :                                                                      ");
+        JLabel editedWordLabel = new JLabel("Edited Word :                                                                    ");
+        JLabel definitionLabel = new JLabel("Vietnamese :                                                                    ");
 
         JTextField editedField = new JTextField();
-        JTextField newWordField = new JTextField();
         JTextArea definitionField = new JTextArea();
 
         subFrame.setSize(frameWidth, frameHeight);
@@ -316,12 +313,6 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
         changeGridBag(gbc, 0, 0, 1, 0);
         subPanel.add(editedWordPanel, gbc);
 
-        newWordPanel.add(newWordLabel);
-        newWordPanel.add(newWordField);
-
-        changeGridBag(gbc, 0, 1, 1, 0);
-        subPanel.add(newWordPanel, gbc);
-
         changeGridBag(gbc, 0, 0, 1, 0);
         definitionPanel.add(definitionLabel, gbc);
 
@@ -336,29 +327,14 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
             int index = Trie.searchAWord(wordInList);
             if (index == -1) {
                 JOptionPane.showMessageDialog(null, "Từ này không có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } else if (Trie.searchAWord(newWordField.getText()) > -1) {
-                JOptionPane.showMessageDialog(null, "Từ muốn đổi đã có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } else {
-                Database.deleteWord(wordInList);
-                Database.insertWord(newWordField.getText(), "", definitionField.getText());
-                Trie.deleteAWord(wordInList);
-                Trie.addWord(newWordField.getText(), index);
-                Word newWord = new Word(newWordField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"); //transform text to Word Object
-                words.set(index, newWord);
+            }  else {
+                Database.updateWord(wordInList, definitionField.getText());
+                words.get(index).word_explain = definitionField.getText();
                 JOptionPane.showMessageDialog(null, "Thao tác sửa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
             }
         });
 
         editedField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-                    newWordField.requestFocus();
-                }
-            }
-        });
-
-        newWordField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == KeyEvent.VK_ENTER) {
@@ -397,7 +373,7 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
             } else {
                     Database.deleteWord(userWord);
                     Trie.deleteAWord(userWord);
-                    words.remove(index);
+                    words.set(index, null);
                 JOptionPane.showMessageDialog(null, "Thao tác xóa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
             }
         });
@@ -505,7 +481,11 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                 }
                 buttons[i].addActionListener(e->{
                     Word word = tempWords.get(finalI1);
-                    translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+                    if (!word.word_pronounce.isEmpty()) {
+                        translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+                    } else {
+                        translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>" + word.word_explain + "</html>");
+                    }
                 });
                 buttons[i].setVisible(true);
                 buttons[i].setEnabled(true);
@@ -528,7 +508,12 @@ public class DictionaryApplication extends DictionaryCommandline implements Acti
                 buttons[i].setVisible(false);
             }
         } else {
-            translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+            if (!word.word_pronounce.isEmpty()) {
+                translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+            } else {
+                translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>" + word.word_explain + "</html>");
+            }
+
         }
     }
 
