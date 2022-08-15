@@ -38,10 +38,8 @@ public class DictionaryApplication extends DictionaryCommandline {
     private final int MAX_BUTTON_NUMS = 20;
     private final JButton[] buttons = new JButton[MAX_BUTTON_NUMS];
     private final Menu menuBar = new Menu();
-
     private int FRAME_WIDTH = 1000;
     private int FRAME_HEIGHT = 650;
-
     private int SEARCH_SIDE_WIDTH = 350;
     private int SEARCH_SIDE_HEIGHT = 600;
     DictionaryApplication() throws IOException {
