@@ -109,7 +109,7 @@ public class SearchSide extends JPanel {
         String userWord = searchField.getText().trim();
 
         //find the word in dictionary and add it to a temporary list
-        List<Integer> tmp = Trie.searchPrefixOfWord(userWord, MAX_BUTTON_NUMS);
+        List<Integer> tmp = Trie.searchPrefixOfWord(userWord.toLowerCase(), MAX_BUTTON_NUMS);
         ArrayList<Word> tempWords = new ArrayList<Word>();
         for (Integer it : tmp) {
             tempWords.add(Dictionary.getWordAt(it));
@@ -155,7 +155,7 @@ public class SearchSide extends JPanel {
      */
     private void search() {
         String userWord = searchField.getText().trim();
-        Word word = Dictionary.getWordAt(Trie.searchAWord(userWord));
+        Word word = Dictionary.getWordAt(Trie.searchAWord(userWord.toLowerCase()));
         if (word == null) {
             TranslateSide.translateArea.setText("Không tìm thấy");
             for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
