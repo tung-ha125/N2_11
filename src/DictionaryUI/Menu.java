@@ -1,9 +1,9 @@
 package DictionaryUI;
 
-import SmallWindow.AddWindow;
-import SmallWindow.EditedWindow;
-import SmallWindow.ErasedWindow;
-import SmallWindow.GGTranslateWindow;
+import DictionaryUI.SmallWindow.AddWindow;
+import DictionaryUI.SmallWindow.EditedWindow;
+import DictionaryUI.SmallWindow.ErasedWindow;
+import DictionaryUI.SmallWindow.GGTranslateWindow;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -20,6 +20,9 @@ public class Menu extends JMenuBar implements ActionListener {
     private final ErasedWindow erasedWindow = new ErasedWindow();
     private final GGTranslateWindow ggTranslateWindow = new GGTranslateWindow();
 
+    /**
+     * constructor.
+     */
     public Menu() {
         //Add action listener to all items
         addMenu.addActionListener(this);

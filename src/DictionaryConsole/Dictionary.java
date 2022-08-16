@@ -38,5 +38,4 @@ public class Dictionary {
             words.remove(index);
         }
     }
-
 }

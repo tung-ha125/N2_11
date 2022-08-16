@@ -11,8 +11,5 @@ public class Main {
         DictionaryApplication dic = new DictionaryApplication();
         dic.runApplication();
         dic.dictionaryAdvance();
-
     }
-
-
 }

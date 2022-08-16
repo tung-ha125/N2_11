@@ -1,4 +1,4 @@
-package SmallWindow;
+package DictionaryUI.SmallWindow;
 
 import DictionaryUI.DictionaryApplication;
 
@@ -9,22 +9,29 @@ import java.io.IOException;
 public class GGTranslateWindow extends JFrame {
     private final int frameWidth = 670;
     private final int frameHeight = 670;
-
     private final JPanel subPanel = new JPanel(new GridLayout());
     private final JPanel searchPanel = new JPanel(new FlowLayout());
     private final JPanel translatePanel = new JPanel(new FlowLayout());
     private final JTextArea searchArea = new JTextArea();
     private final JTextArea translateArea = new JTextArea();
-    private final JScrollPane searchScroll = new JScrollPane(searchArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    private final JScrollPane translateScroll = new JScrollPane(translateArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    private final JScrollPane searchScroll = new JScrollPane(searchArea,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    private final JScrollPane translateScroll = new JScrollPane(translateArea,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     private final JButton searchButton = new JButton("Search Text");
     private final JButton spellButton = new JButton("Spell");
 
     public GGTranslateWindow() {
-
+        //do nothing
     }
 
+    /**
+     * render GG translate window.
+     */
     public void renderWindow() {
+        //set up for frame
         this.setTitle("GG Translate");
         DictionaryApplication.setFrame(this, frameWidth, frameHeight);
 

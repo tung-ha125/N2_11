@@ -11,12 +11,23 @@ public class Word {
         word_explain = "";
     }
 
+    /**
+     * constructor. Set default word_pronounce to empty
+     * @param word_target English
+     * @param word_explain definition
+     */
     public Word(String word_target, String word_explain) {
         this.word_target = word_target;
         this.word_pronounce = "";
         this.word_explain = word_explain;
     }
 
+    /**
+     * constructor.
+     * @param word_target English
+     * @param word_pronounce how to spell
+     * @param word_explain definition
+     */
     public Word(String word_target, String word_pronounce, String word_explain) {
         this.word_target = word_target;
         this.word_pronounce = word_pronounce;

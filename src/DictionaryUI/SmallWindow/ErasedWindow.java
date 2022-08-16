@@ -1,4 +1,4 @@
-package SmallWindow;
+package DictionaryUI.SmallWindow;
 
 import DictionaryConsole.Dictionary;
 import DictionaryUI.DictionaryApplication;
@@ -12,9 +12,7 @@ import java.awt.event.ActionListener;
 public class ErasedWindow extends JFrame implements ActionListener {
     private final int frameWidth = 300;
     private final int frameHeight = 300;
-
     private final JPanel mainPanel = new JPanel(new FlowLayout());
-
     private final JPanel erasePanel = new JPanel(new GridLayout(2, 0));
     private final JLabel eraseLabel = new JLabel("DictionaryConsole.Word to erase:                                                                  ");
     private final JTextArea eraseField = new JTextArea();
@@ -24,6 +22,9 @@ public class ErasedWindow extends JFrame implements ActionListener {
 
     }
 
+    /**
+     * render erased window.
+     */
     public void renderWindow() {
         this.setTitle("Erase");
         DictionaryApplication.setFrame(this, frameWidth, frameHeight);
@@ -32,15 +33,16 @@ public class ErasedWindow extends JFrame implements ActionListener {
         eraseButton.setFocusable(false);
         eraseButton.addActionListener(this);
 
-        //set up for erase site
+        //set up for erase side
         eraseField.setBorder(BorderFactory.createLineBorder(new Color(127, 138, 148)));
         erasePanel.add(eraseLabel);
         erasePanel.add(eraseField);
 
-        //add erase site to main panel
+        //add erase side to main panel
         mainPanel.add(erasePanel);
         mainPanel.add(eraseButton);
 
+        //add panel to frame
         this.add(mainPanel);
     }
 

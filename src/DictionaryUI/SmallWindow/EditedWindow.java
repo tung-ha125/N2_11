@@ -1,4 +1,4 @@
-package SmallWindow;
+package DictionaryUI.SmallWindow;
 
 import DictionaryConsole.Dictionary;
 import DictionaryConsole.Word;
@@ -16,7 +16,6 @@ import java.awt.event.KeyEvent;
 public class EditedWindow extends JFrame implements ActionListener {
     private final int frameWidth = 300;
     private final int frameHeight = 300;
-
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final JPanel editedWordPanel = new JPanel(new GridLayout(2, 0));
     private final JPanel definitionPanel = new JPanel(new GridBagLayout());
@@ -31,7 +30,9 @@ public class EditedWindow extends JFrame implements ActionListener {
         gbc.fill = GridBagConstraints.BOTH;
     }
 
-
+    /**
+     * render edited window.
+     */
     public void renderWindow() {
         //set up for main frame
         this.setTitle("Edit");
@@ -71,7 +72,7 @@ public class EditedWindow extends JFrame implements ActionListener {
     }
 
     /**
-     * do edited action when edited button is clicked
+     * do edit action when edited button is clicked.
      * @param e action event
      */
     @Override

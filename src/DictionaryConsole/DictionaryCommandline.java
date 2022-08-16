@@ -1,8 +1,5 @@
 package DictionaryConsole;
 
-import DictionaryConsole.DictionaryManagement;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -28,7 +25,7 @@ public class DictionaryCommandline extends DictionaryManagement {
         }
     }
 
-    public void dictionaryBasic() throws FileNotFoundException, IOException {
+    public void dictionaryBasic() {
 
     }
 
@@ -38,7 +35,11 @@ public class DictionaryCommandline extends DictionaryManagement {
         showAllWords(list);
     }
 
-    public void dictionaryAdvance() throws FileNotFoundException, IOException {
+    /**
+     * renders menu and chooses action to do
+     * @throws IOException throws exception if program can not access to file
+     */
+    public void dictionaryAdvance() throws IOException {
         boolean quitFlag = false;
         while(!quitFlag) {
             System.out.println("Danh sách chức năng: \n"

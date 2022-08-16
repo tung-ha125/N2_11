@@ -1,9 +1,9 @@
-package SmallWindow;
+package DictionaryUI.SmallWindow;
 
+import Database.Database;
 import DictionaryConsole.Dictionary;
 import DictionaryConsole.Word;
 import DictionaryUI.DictionaryApplication;
-import Database.Database;
 import Trie.Trie;
 
 import javax.swing.*;
@@ -16,23 +16,25 @@ import java.awt.event.KeyEvent;
 public class AddWindow extends JFrame implements ActionListener {
     private final int frameWidth = 300;
     private final int frameHeight = 300;
-
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final JPanel newWordPanel = new JPanel(new GridLayout(2, 0));
     private final JPanel definitionPanel = new JPanel(new GridBagLayout());
     private final JLabel newWordLabel = new JLabel("New DictionaryConsole.Word:                                                                    ");
     private final JLabel definitionLabel = new JLabel("Definition                                                                      ");
-
     private final JTextField newWordField = new JTextField();
     private final JTextArea definitionField = new JTextArea();
     private final JButton addButton = new JButton("Add");
-    private GridBagConstraints gbc = new GridBagConstraints();
+    private final GridBagConstraints gbc = new GridBagConstraints();
 
     public AddWindow() {
         gbc.fill = GridBagConstraints.BOTH;
     }
 
+    /**
+     * render added window.
+     */
     public void renderWindow() {
+        //set up for frame
         this.setTitle("Add");
         DictionaryApplication.setFrame(this, frameWidth, frameHeight);
 
@@ -75,7 +77,7 @@ public class AddWindow extends JFrame implements ActionListener {
     }
 
     /**
-     * action while clicks add button
+     * action while clicks add button.
      * @param e action event
      */
     @Override
@@ -87,7 +89,7 @@ public class AddWindow extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Từ này đã có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
             } else {
                 Trie.addWord(userWord, Dictionary.words.size());
-                Database.insertWord(userWord,"", definitionField.getText());
+                Database.insertWord(userWord, "", definitionField.getText());
                 Dictionary.words.add(new Word(userWord, "<ul><li>" + definitionField.getText() + "</li></ul>"));
                 JOptionPane.showMessageDialog(null, "Thêm từ thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
             }
