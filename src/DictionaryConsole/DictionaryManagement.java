@@ -16,6 +16,9 @@ public class DictionaryManagement extends Dictionary {
         insertFromFile();
     }
 
+    /**
+     * insert words user want to add.
+     */
     public void insertFromCommandline() {
         int n;
         String s;
@@ -37,6 +40,10 @@ public class DictionaryManagement extends Dictionary {
         }
     }
 
+    /**
+     * insert words from txt file to dictionary.
+     * @throws FileNotFoundException if file txt can not be accessed
+     */
     public void insertFromFile() throws FileNotFoundException {
         String path = "src/dictionaries.txt";
         File file = new File(path);
@@ -60,6 +67,11 @@ public class DictionaryManagement extends Dictionary {
         }
     }
 
+    /**
+     * use for insertFromFile function.
+     * @param line line in text file
+     * @return word after handling
+     */
     private Word handleLine(String line) {
         String word_target = "";
         String word_explain = "";
@@ -75,6 +87,9 @@ public class DictionaryManagement extends Dictionary {
         return new Word(word_target,word_explain);
     }
 
+    /**
+     * find word in dictionary
+     */
     public void dictionaryLookup() {
         String userWord = getUserWord("find");
         Word word = findWordInDictionary(userWord);
@@ -85,6 +100,11 @@ public class DictionaryManagement extends Dictionary {
         }
     }
 
+    /**
+     * get action user want to do and take input.
+     * @param s
+     * @return
+     */
     public String getUserWord(String s) {
         if (s.equals("find")) {
             System.out.print("Nhap tu ban muon tim: ");
@@ -107,6 +127,11 @@ public class DictionaryManagement extends Dictionary {
         return word.toLowerCase();
     }
 
+    /**
+     * finds word in dictionary.
+     * @param word input
+     * @return word
+     */
     protected Word findWordInDictionary(String word) {
         for (Word i : words) {
             if(Objects.equals(word, i.getWord_target().toLowerCase())) {
@@ -116,6 +141,11 @@ public class DictionaryManagement extends Dictionary {
         return null;
     }
 
+    /**
+     * find words in dictionary have pre-fix likes the input.
+     * @param s input
+     * @return list of words.
+     */
     public ArrayList<Word> dictionarySearcher(String s) {
         ArrayList<Word> a1 = new ArrayList<Word>();
         ArrayList<Word> a2 = new ArrayList<Word>();
@@ -146,6 +176,10 @@ public class DictionaryManagement extends Dictionary {
         return a1;
     }
 
+    /**
+     * add action use in console version.
+     * @throws IOException can not open file.
+     */
     public void add() throws IOException {
         String newTarget = getUserWord("add");
         if (findWordInDictionary(newTarget) != null) {
@@ -165,6 +199,10 @@ public class DictionaryManagement extends Dictionary {
         System.out.println(("Thao tac them thanh cong!!!"));
     }
 
+    /**
+     * edit action use in console version.
+     * @throws IOException can not open file.
+     */
     public void edit() throws IOException {
         Word userWord = findWordInDictionary(getUserWord("edit"));
         if (userWord == null) {
@@ -184,6 +222,10 @@ public class DictionaryManagement extends Dictionary {
         System.out.println(("Thao tac sua thanh cong!!!"));
     }
 
+    /**
+     * erase action use in console version.
+     * @throws IOException can not open file.
+     */
     public void erase() throws IOException {
         Word userWord = findWordInDictionary(getUserWord("erase"));
         if (userWord == null) {
@@ -217,6 +259,10 @@ public class DictionaryManagement extends Dictionary {
         Files.write(path, lines, ENCODING);
     }
 
+    /**
+     * update to txt file if dictionary has changes.
+     * @throws IOException can not open file
+     */
     public void dictionaryExportToFile() throws IOException{
         String path = "src/dictionaries.txt";
         ArrayList<String> S = new ArrayList<>();
