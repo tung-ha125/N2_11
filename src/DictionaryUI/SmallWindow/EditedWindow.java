@@ -82,15 +82,9 @@ public class EditedWindow extends JFrame implements ActionListener {
             int index = Trie.searchAWord(wordInList);
             if (index == -1) {
                 JOptionPane.showMessageDialog(null, "Từ này không có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } else if (Trie.searchAWord(editedField.getText()) > -1) {
-                JOptionPane.showMessageDialog(null, "Từ muốn đổi đã có trong hệ thống !", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } else {
-                Database.deleteWord(wordInList);
-                Database.insertWord(editedField.getText(), "", definitionField.getText());
-                Trie.deleteAWord(wordInList);
-                Trie.addWord(editedField.getText(), index);
-                Word newWord = new Word(editedField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"); //transform text to DictionaryConsole.Word Object
-                Dictionary.words.set(index, newWord);
+            }  else {
+                Database.updateWord(wordInList, definitionField.getText());
+                Dictionary.words.get(index).word_explain = definitionField.getText();
                 JOptionPane.showMessageDialog(null, "Thao tác sửa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
             }
         }

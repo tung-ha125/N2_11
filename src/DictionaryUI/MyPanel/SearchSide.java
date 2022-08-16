@@ -109,7 +109,7 @@ public class SearchSide extends JPanel {
         String userWord = searchField.getText().trim();
 
         //find the word in dictionary and add it to a temporary list
-        List<Integer> tmp = Trie.searchPrefixOfWord(userWord.toLowerCase(), MAX_BUTTON_NUMS);
+        List<Integer> tmp = Trie.searchPrefixOfWord(userWord, MAX_BUTTON_NUMS);
         ArrayList<Word> tempWords = new ArrayList<Word>();
         for (Integer it : tmp) {
             tempWords.add(Dictionary.getWordAt(it));
@@ -132,7 +132,11 @@ public class SearchSide extends JPanel {
                 }
                 buttons[i].addActionListener(e->{
                     Word word = tempWords.get(finalI1);
-                    TranslateSide.translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+                    if (!word.word_pronounce.isEmpty()) {
+                        TranslateSide.translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+                    } else {
+                        TranslateSide.translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>" + word.word_explain + "</html>");
+                    }
                 });
                 buttons[i].setVisible(true);
                 buttons[i].setEnabled(true);
@@ -151,7 +155,7 @@ public class SearchSide extends JPanel {
      */
     private void search() {
         String userWord = searchField.getText().trim();
-        Word word = Dictionary.getWordAt(Trie.searchAWord(userWord.toLowerCase()));
+        Word word = Dictionary.getWordAt(Trie.searchAWord(userWord));
         if (word == null) {
             TranslateSide.translateArea.setText("Không tìm thấy");
             for (int i = 0; i < MAX_BUTTON_NUMS; i++) {
@@ -159,7 +163,11 @@ public class SearchSide extends JPanel {
                 buttons[i].setVisible(false);
             }
         } else {
-            TranslateSide.translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+            if (!word.word_pronounce.isEmpty()) {
+                TranslateSide.translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>"  + "<u>Phát âm</u>: " + word.word_pronounce + word.word_explain + "</html>");
+            } else {
+                TranslateSide.translateArea.setText("<html> <h1 color=purple>" + word.word_target + "</h1>" + word.word_explain + "</html>");
+            }
         }
     }
 }

@@ -14,7 +14,7 @@ public class ErasedWindow extends JFrame implements ActionListener {
     private final int frameHeight = 300;
     private final JPanel mainPanel = new JPanel(new FlowLayout());
     private final JPanel erasePanel = new JPanel(new GridLayout(2, 0));
-    private final JLabel eraseLabel = new JLabel("DictionaryConsole.Word to erase:                                                                  ");
+    private final JLabel eraseLabel = new JLabel("Word to erase:                                                                  ");
     private final JTextArea eraseField = new JTextArea();
     private final JButton eraseButton = new JButton("Erase");
 
@@ -59,7 +59,7 @@ public class ErasedWindow extends JFrame implements ActionListener {
         } else {
             Database.deleteWord(userWord);
             Trie.deleteAWord(userWord);
-            Dictionary.words.remove(index);
+            Dictionary.words.set(index, null);
             JOptionPane.showMessageDialog(null, "Thao tác xóa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
         }
     }
