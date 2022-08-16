@@ -1,6 +1,6 @@
+package DictionaryConsole;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class Dictionary {
     public static ArrayList<Word> words = new ArrayList<>();

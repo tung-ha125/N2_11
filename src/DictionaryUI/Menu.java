@@ -1,7 +1,13 @@
+package DictionaryUI;
+
+import SmallWindow.AddWindow;
+import SmallWindow.EditedWindow;
+import SmallWindow.ErasedWindow;
+import SmallWindow.GGTranslateWindow;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 public class Menu extends JMenuBar implements ActionListener {
     private final JMenu featuresMenu = new JMenu("Features");

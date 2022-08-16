@@ -1,5 +1,9 @@
-import Trie.Trie;
+package SmallWindow;
 
+import DictionaryConsole.Dictionary;
+import DictionaryUI.DictionaryApplication;
+import Trie.Trie;
+import Database.Database;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +16,7 @@ public class ErasedWindow extends JFrame implements ActionListener {
     private final JPanel mainPanel = new JPanel(new FlowLayout());
 
     private final JPanel erasePanel = new JPanel(new GridLayout(2, 0));
-    private final JLabel eraseLabel = new JLabel("Word to erase:                                                                  ");
+    private final JLabel eraseLabel = new JLabel("DictionaryConsole.Word to erase:                                                                  ");
     private final JTextArea eraseField = new JTextArea();
     private final JButton eraseButton = new JButton("Erase");
 

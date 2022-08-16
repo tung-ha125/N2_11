@@ -1,3 +1,9 @@
+package SmallWindow;
+
+import DictionaryConsole.Dictionary;
+import DictionaryConsole.Word;
+import DictionaryUI.DictionaryApplication;
+import Database.Database;
 import Trie.Trie;
 
 import javax.swing.*;
@@ -14,7 +20,7 @@ public class EditedWindow extends JFrame implements ActionListener {
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final JPanel editedWordPanel = new JPanel(new GridLayout(2, 0));
     private final JPanel definitionPanel = new JPanel(new GridBagLayout());
-    private final JLabel editedWordLabel = new JLabel("Edited Word :                                                                    ");
+    private final JLabel editedWordLabel = new JLabel("Edited DictionaryConsole.Word :                                                                    ");
     private final JLabel definitionLabel = new JLabel("Vietnamese :                                                                    ");
     private final JTextField editedField = new JTextField();
     private final JTextArea definitionField = new JTextArea();
@@ -82,7 +88,7 @@ public class EditedWindow extends JFrame implements ActionListener {
                 Database.insertWord(editedField.getText(), "", definitionField.getText());
                 Trie.deleteAWord(wordInList);
                 Trie.addWord(editedField.getText(), index);
-                Word newWord = new Word(editedField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"); //transform text to Word Object
+                Word newWord = new Word(editedField.getText(), "<ul><li>" + definitionField.getText() + "</li></ul>"); //transform text to DictionaryConsole.Word Object
                 Dictionary.words.set(index, newWord);
                 JOptionPane.showMessageDialog(null, "Thao tác sửa thành công !", "Thông báo", JOptionPane.PLAIN_MESSAGE);
             }

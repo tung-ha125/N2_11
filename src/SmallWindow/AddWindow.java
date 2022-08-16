@@ -1,3 +1,9 @@
+package SmallWindow;
+
+import DictionaryConsole.Dictionary;
+import DictionaryConsole.Word;
+import DictionaryUI.DictionaryApplication;
+import Database.Database;
 import Trie.Trie;
 
 import javax.swing.*;
@@ -14,7 +20,7 @@ public class AddWindow extends JFrame implements ActionListener {
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final JPanel newWordPanel = new JPanel(new GridLayout(2, 0));
     private final JPanel definitionPanel = new JPanel(new GridBagLayout());
-    private final JLabel newWordLabel = new JLabel("New Word:                                                                    ");
+    private final JLabel newWordLabel = new JLabel("New DictionaryConsole.Word:                                                                    ");
     private final JLabel definitionLabel = new JLabel("Definition                                                                      ");
 
     private final JTextField newWordField = new JTextField();

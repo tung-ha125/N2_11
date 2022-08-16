@@ -1,3 +1,7 @@
+package DictionaryConsole;
+
+import DictionaryConsole.Dictionary;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;

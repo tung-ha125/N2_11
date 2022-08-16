@@ -1,3 +1,7 @@
+package SmallWindow;
+
+import DictionaryUI.DictionaryApplication;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;

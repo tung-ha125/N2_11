@@ -1,9 +1,14 @@
+package Database;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+
+import DictionaryConsole.Dictionary;
+import DictionaryConsole.Word;
 import Trie.Trie;
 
 public class Database {
@@ -13,7 +18,7 @@ public class Database {
     private static Connection connection = null;
 
     /**
-     * Connect to Database;
+     * Connect to Database.Database;
      */
     public static void connectToDatabase() {
         System.out.println("Connecting database...");
@@ -23,13 +28,13 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("Database connected!");
+        System.out.println("Database.Database connected!");
     }
 
 
     public static void closeDatabase() {
         close(connection);
-        System.out.println("Database disconnected!");
+        System.out.println("Database.Database disconnected!");
     }
 
     /**
@@ -78,7 +83,7 @@ public class Database {
     }
 
     /**
-     * Get all Words from database to Dictionary.
+     * Get all Words from database to DictionaryConsole.Dictionary.
      */
     public static void getAllWord() {
         final String SQL_QUERY = "SELECT * FROM ev_txt";

@@ -1,10 +1,14 @@
+package DictionaryConsole;
+
+import DictionaryConsole.DictionaryManagement;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class DictionaryCommandline extends DictionaryManagement {
 
-    DictionaryCommandline() throws IOException {
+    public DictionaryCommandline() throws IOException {
 
     }
 

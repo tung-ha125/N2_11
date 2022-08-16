@@ -9,7 +9,7 @@ public class Trie {
     /**
      * Add a word to trie and it's index.
      * @param Word the word add to trie
-     * @param index index of word in List<Word>
+     * @param index index of word in List<DictionaryConsole.Word>
      */
     public static void addWord(String Word,int index) {
         Node it = root;
@@ -29,7 +29,7 @@ public class Trie {
     /**
      * Search a word on trie.
      * @param Word word to search
-     * @return index of word in List<Word>
+     * @return index of word in List<DictionaryConsole.Word>
      */
     public static int searchAWord(String Word) {
         Node it = root;
@@ -51,7 +51,7 @@ public class Trie {
      * Search prefix of word on trie.
      * @param Word prefix of word to search
      * @param limit count of word to return
-     * @return List<Integer> of word's indexes in List<Word>
+     * @return List<Integer> of word's indexes in List<DictionaryConsole.Word>
      */
     public static List<Integer> searchPrefixOfWord(String Word, int limit) {
         Node it = root;

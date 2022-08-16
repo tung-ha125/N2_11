@@ -1,7 +1,8 @@
-import javax.xml.crypto.Data;
+import Database.Database;
+import DictionaryUI.DictionaryApplication;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
